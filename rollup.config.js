@@ -8,10 +8,12 @@ import multi from '@rollup/plugin-multi-entry'
 
 const dev = process.env.ROLLUP_WATCH
 
+const outputFile = dev ? 'build/ospi-cards.js' : 'dist/ospi-cards.js'
+
 export default {
 	input: ['src/**/*.ts'],
 	output: {
-		file: 'dist/ospi-cards.js',
+		file: outputFile,
 		format: 'es'
 	},
 	plugins: [

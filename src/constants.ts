@@ -1,7 +1,7 @@
 import { IconConfig } from './types'
 
 export const defaults = {
-	version: '0.2.0',
+	version: '0.3.0',
 
 	imageHeightDefault: 150,
 

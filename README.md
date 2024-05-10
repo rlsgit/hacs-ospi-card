@@ -16,7 +16,7 @@ Requires:
 
 ## Install
 
-OpenSprinkler Card is available from [HACS][hacs] (search for "ospi cards"). If you don't have [HACS][hacs] installed, follow the [manual installation](#manual) instructions.
+OpenSprinkler Card is available from [HACS][hacs] (search for "ospi cards"). If you don't have [HACS][hacs] installed, follow the [manual installation](#manual-installation) instructions.
 
 ## Cards
 
@@ -57,7 +57,7 @@ Otherwise, make sure:
 - The id of the rain delay active binary sensor ends with `_rain_delay_active`
 - The id of the rain delay stop time sensor ends with `_rain_delay_stop_time`
 
-[## Manual installation](#manual)
+[## Manual installation](#manual-installation)
 
 1. Download `ospi-cards.js` from the [latest release][release] and move this file to the `config/www` folder.
 2. Ensure you have advanced mode enabled (accessible via your username in the bottom left corner)
