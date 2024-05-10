@@ -28,7 +28,14 @@ export class OSPiSystemCardEditor extends LitElement {
 			}
 		}
 
-		this.config = config
+		this.config = {
+			showSensor1: false,
+			sensor1Name: 'Sensor 1',
+			showSensor2: false,
+			sensor2Name: 'Sensor 2',
+
+			...config
+		}
 
 		this.loadCardHelpers()
 	}
@@ -49,12 +56,20 @@ export class OSPiSystemCardEditor extends LitElement {
 				return 'Name (Required)'
 			case 'showName':
 				return 'Show Name'
+			case 'showSensor1':
+				return 'Show Sensor 1'
+			case 'sensor1Name':
+				return 'Sensor 1 Name'
+			case 'showSensor2':
+				return 'Show Sensor 2'
+			case 'sensor2Name':
+				return 'Sensor 2 Name'
 			case 'image':
-				return 'Image (Optional)'
+				return 'Image'
 			case 'imageHeight':
-				return 'Image Height (Optional, default = 150)'
+				return 'Image Height (default = 150)'
 			case 'imagePosition':
-				return 'Image Position (Optional, default = cover)'
+				return 'Image Position (default = cover)'
 			default:
 				return ''
 		}
@@ -70,6 +85,10 @@ export class OSPiSystemCardEditor extends LitElement {
 			{ name: 'device', selector: { device: { integration: 'opensprinkler', manufacturer: 'OpenSprinkler' } } },
 			{ name: 'name', selector: { text: {} } },
 			{ name: 'showName', selector: { boolean: {} } },
+			{ name: 'showSensor1', selector: { boolean: {} } },
+			{ name: 'sensor1Name', selector: { text: {} } },
+			{ name: 'showSensor2', selector: { boolean: {} } },
+			{ name: 'sensor2Name', selector: { text: {} } },
 			{ name: 'image', selector: { text: {} } },
 			{ name: 'imageHeight', selector: { text: {} } },
 			{

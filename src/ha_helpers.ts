@@ -136,7 +136,8 @@ export interface HomeAssistant {
 
 type matcherFunc = (entity: EntityRegistryDisplayEntry, state: HassEntity) => boolean
 
-export function getEntities(hass: HomeAssistant, device?: string, matcher?: matcherFunc): { entity: EntityRegistryDisplayEntry; state: HassEntity }[] {
+export type EntityAndStateType = { entity: EntityRegistryDisplayEntry; state: HassEntity }
+export function getEntities(hass: HomeAssistant, device?: string, matcher?: matcherFunc): EntityAndStateType[] {
 	let ret: { entity: EntityRegistryDisplayEntry; state: HassEntity }[] = []
 	for (const e in hass.entities) {
 		if (device && hass.entities[e].device_id !== device) continue

@@ -11,7 +11,7 @@ import { defaults, defaultIcons } from '../constants'
 import { fireEvent, getCardStyle, getEntities, getEntityState, HomeAssistant } from '../ha_helpers'
 import { isEnabled, stateActivated, stateStoppable } from '../os_helpers'
 
-import OSPiCardRuntimeDialog from './runtimedialog'
+import OSPiStationCardRuntimeDialog from './runtimedialog'
 
 export interface OSPiStationCardConfig {
 	name: string
@@ -33,7 +33,7 @@ export default class OSPiStationCard extends LitElement {
 
 	private state?: HassEntity
 
-	private runtimeDialog?: OSPiCardRuntimeDialog
+	private runtimeDialog?: OSPiStationCardRuntimeDialog
 
 	// card configuration
 	static getConfigElement() {
@@ -211,7 +211,7 @@ export default class OSPiStationCard extends LitElement {
 	public connectedCallback(): void {
 		super.connectedCallback()
 
-		this.runtimeDialog = new OSPiCardRuntimeDialog()
+		this.runtimeDialog = new OSPiStationCardRuntimeDialog()
 		document.body.appendChild(this.runtimeDialog)
 	}
 

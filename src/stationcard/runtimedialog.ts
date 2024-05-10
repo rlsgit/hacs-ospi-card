@@ -1,22 +1,23 @@
-import { css, html, LitElement } from 'lit'
-import { customElement, property, state } from 'lit/decorators.js'
+import { html, LitElement } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 import { mdiClose } from '@mdi/js'
+import { getDevString } from '../constants'
 
 export const defaultRuntime = 60
-export type OSPiCardRuntimeDialogOptionsType = {
+export type OSPiStationCardRuntimeDialogOptionsType = {
 	runtime?: number
 	runAction: (runtime: number) => void
 }
 
-@customElement('ospi-card-runtime-dialog')
-export default class OSPiCardRuntimeDialog extends LitElement {
+@customElement(getDevString('ospi-stationcard-runtime-dialog'))
+export default class OSPiStationCardRuntimeDialog extends LitElement {
 	@state() private open = false
 	@state() private runtime: number
 	@state() private error: string
 
-	private config: OSPiCardRuntimeDialogOptionsType
+	private config: OSPiStationCardRuntimeDialogOptionsType
 
-	public show(config: OSPiCardRuntimeDialogOptionsType) {
+	public show(config: OSPiStationCardRuntimeDialogOptionsType) {
 		this.config = {
 			runtime: defaultRuntime,
 			...config

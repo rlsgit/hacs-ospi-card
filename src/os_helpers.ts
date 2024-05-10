@@ -1,4 +1,4 @@
-import type { HassEntity, LitElement, HomeAssistant } from './ha_helpers'
+import { getEntities, type EntityAndStateType, type HassEntity, type HomeAssistant } from './ha_helpers'
 
 export type EntitiesFunc = (predicate: (entity: HassEntity) => boolean) => HassEntity[]
 
@@ -12,6 +12,7 @@ const STOPPABLE_STATES = [...ACTIVE_STATES, ...WAITING_STATES]
 export const isStation = (entity: HassEntity) => entity.attributes.opensprinkler_type === 'station' && entity.entity_id.startsWith('sensor.')
 export const isProgram = (entity: HassEntity) => entity.attributes.opensprinkler_type === 'program' && entity.entity_id.startsWith('binary_sensor.')
 export const isController = (entity: HassEntity) => entity.attributes.opensprinkler_type === 'controller' && entity.entity_id.startsWith('switch.')
+export const isSystem = (entity: HassEntity) => entity.attributes.opensprinkler_type === undefined
 
 export const isRunOnce = (entity: HassEntity) => entity.entity_id === 'run_once'
 export const isState = (entity: HassEntity) => !entity.attributes?.opensprinkler_type
@@ -59,4 +60,15 @@ export function isEnabled(hass: HomeAssistant, entity: HassEntity) {
 	}
 
 	return false
+}
+
+export function getSystemStatusEntities(hass: HomeAssistant, device: string): Record<string, EntityAndStateType> {
+	const entities = getEntities(hass, device, (entity, state) => isSystem(state))
+
+	let ret = {}
+	for (const entity of entities) {
+		ret[entity.entity.entity_id] = entity
+	}
+
+	return ret
 }

@@ -1,18 +1,24 @@
 import { html, LitElement, TemplateResult, css, PropertyValues, nothing } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
-import { mdiPlay, mdiStop, mdiDotsVertical, mdiClose } from '@mdi/js'
+import { mdiDotsVertical } from '@mdi/js'
 import moment from 'moment'
 
 import { HassEntity } from 'home-assistant-js-websocket'
 
 import { OSPiSystemCardConfigElement, OSPiSystemCardElement } from './index'
 import { defaults } from '../constants'
-import { getCardStyle, getEntities, HomeAssistant } from '../ha_helpers'
-import { isEnabled, stateActivated, stateStoppable } from '../os_helpers'
+import { EntityAndStateType, getCardStyle, getEntities, HomeAssistant } from '../ha_helpers'
+import { getSystemStatusEntities, isEnabled, stateActivated, stateStoppable } from '../os_helpers'
+
+import OSPiSystemCardDelayDialog from './delaydialog'
 
 export interface OSPiSystemCardConfig {
 	name: string
 	showName: boolean
+	showSensor1?: boolean
+	sensor1Name?: string
+	showSensor2?: boolean
+	sensor2Name?: string
 	image?: string
 	imageHeight?: number
 	imagePosition?: 'cover' | 'contain'
@@ -23,6 +29,10 @@ export interface OSPiSystemCardConfig {
 export default class OSPiSystemCard extends LitElement {
 	@property({ attribute: false }) public hass?: HomeAssistant
 	@state() private config!: OSPiSystemCardConfig
+
+	private state?: Record<string, EntityAndStateType>
+
+	private delayDialog?: OSPiSystemCardDelayDialog
 
 	// card configuration
 	static getConfigElement() {
@@ -70,64 +80,97 @@ export default class OSPiSystemCard extends LitElement {
 	private cardName(): TemplateResult {
 		if (!this.config.showName) return html``
 
-		let menu = html`
-			<mwc-icon-button class="more-info" label="Open more info" @click=${this.menuClick} tabindex="0" style="margin-inline-end: -8px">
-				<ha-svg-icon .path=${mdiDotsVertical}></ha-svg-icon>
-			</mwc-icon-button>
-		`
-
 		return html`
 			<div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
 				<div style="font-weight: bold; font-size: 24px;">${this.config.name}</div>
-				<div style="position: absolute; right: 0;">${menu}</div>
 			</div>
 		`
 	}
 
+	private getStateStatus(entity: string) {
+		if (!(entity in this.state)) return nothing
+
+		const state = this.state[entity]
+		let value = state.state.state
+		if (!value || value === 'unknown') return nothing
+
+		let name = state.state.attributes.friendly_name
+		name = name.replace('OpenSprinkler ', '').replace(' Active', '')
+		if (entity.includes('opensprinkler_sensor_1')) name = this.config.sensor1Name || name
+		if (entity.includes('opensprinkler_sensor_2')) name = this.config.sensor2Name || name
+
+		if (state.state.attributes.unit_of_measurement) {
+			value += state.state.attributes.unit_of_measurement
+		}
+
+		let ret = html``
+		let valueHtml = html`<div class="system-status-item-value">${value}</div>`
+		switch (entity) {
+			case 'binary_sensor.opensprinkler_rain_delay_active':
+				if (state.state.state === 'on') {
+					const endTimeEntity = this.state['sensor.opensprinkler_rain_delay_stop_time']
+					if (!endTimeEntity) {
+						value = 'off'
+					} else {
+						const duration = moment.duration(moment(endTimeEntity.state.state).diff(moment()))
+						value = 'Ends ' + duration.humanize(true)
+					}
+				}
+
+				valueHtml = html`<div class="system-status-item-value">${value}</div>`
+				return html`<mwc-button @click=${() => this.delayClick('rain')}
+					><div class="system-status-item">
+						<div class="system-status-item-name">${name}:</div>
+						${valueHtml}
+					</div></mwc-button
+				>`
+				break
+
+			case 'binary_sensor.opensprinkler_paused':
+				if (state.state.state === 'on') {
+					const endTimeEntity = this.state['sensor.opensprinkler_pause_end_time']
+					if (endTimeEntity && endTimeEntity.state.state !== 'unknown') {
+						const duration = moment.duration(moment(endTimeEntity.state.state).diff(moment()))
+						value = 'Ends ' + duration.humanize(true)
+					} else {
+						value = 'off'
+					}
+				}
+
+				// valueHtml = html`<mwc-button @click=${() => this.delayClick('pause')}><div class="system-status-item-value">${value}</div></mwc-button>`
+				valueHtml = html`<div class="system-status-item-value">${value}</div>`
+				return html`<mwc-button @click=${() => this.delayClick('pause')}
+					><div class="system-status-item">
+						<div class="system-status-item-name">${name}:</div>
+						${valueHtml}
+					</div></mwc-button
+				>`
+				break
+
+			default:
+				break
+		}
+
+		ret = html`<div class="system-status-item">
+			<div class="system-status-item-name">${name}:</div>
+			${valueHtml}
+		</div>`
+
+		return ret
+	}
+
 	private cardStatus(): TemplateResult {
-		let stateText = ''
-
-		const style = `
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    `
-
-		const badge = html` ${stateText} `
-
-		return html` <div style="${style}">${badge}</div> `
+		return html`
+			<div class="system-status">
+				${this.getStateStatus('binary_sensor.opensprinkler_sensor_1_active')} ${this.getStateStatus('binary_sensor.opensprinkler_sensor_2_active')}
+				${this.getStateStatus('sensor.opensprinkler_current_draw')} ${this.getStateStatus('sensor.opensprinkler_water_level')} ${this.getStateStatus('sensor.opensprinkler_flow_rate')}
+				${this.getStateStatus('binary_sensor.opensprinkler_paused')} ${this.getStateStatus('binary_sensor.opensprinkler_rain_delay_active')}
+			</div>
+		`
 	}
 
 	private history(): TemplateResult {
 		let ret = html``
-
-		// if (this.lastRun === undefined) {
-		// 	const sensors = getEntities(this.hass, this.config.device, (entity, state) => {
-		// 		if (state && state.attributes.opensprinkler_type === 'station' && state.attributes.index === this.state.attributes.index && entity.entity_id.startsWith('binary_sensor.')) {
-		// 			return true
-		// 		}
-		// 		return false
-		// 	})
-
-		// 	const entity = sensors[0]
-
-		// 	this.hass.callApi('GET', `history/period?filter_entity_id=${entity.entity.entity_id}&minimal_response=true&no_attributes=true`).then((data) => {
-		// 		// console.log(data)
-		// 		const history = data[0]
-		// 		for (let index = history.length - 1; index >= 0; index--) {
-		// 			if (history[index].state === 'off' && index > 0) {
-		// 				const start = moment(history[index - 1].last_changed)
-		// 				const stop = moment(history[index].last_changed)
-		// 				const duration = moment.duration(stop.diff(start))
-
-		// 				this.lastRun = `Last run: ${start.format('M/D/YY h:mm A')} for ${duration.humanize()}`
-		// 				break
-		// 			}
-		// 		}
-		// 	})
-		// }
-
-		// return html`<div style="text-align: center; font-style: italic;">${this.lastRun}</div>`
 
 		return ret
 	}
@@ -135,7 +178,16 @@ export default class OSPiSystemCard extends LitElement {
 	render() {
 		if (!this.config) return nothing
 
-		// this.state = getEntityState(this.hass, this.config.station)
+		const sysState = getSystemStatusEntities(this.hass, this.config.device)
+		// console.log(sysState)
+
+		this.state = {}
+		for (const entity in sysState) {
+			if (entity.includes('opensprinkler_sensor_1') && !this.config.showSensor1) continue
+			if (entity.includes('opensprinkler_sensor_2') && !this.config.showSensor2) continue
+
+			this.state[entity] = sysState[entity]
+		}
 
 		return html` <ha-card style="${getCardStyle()}"> ${this.cardImage()} ${this.cardName()} ${this.cardStatus()} ${this.history()} </ha-card> `
 	}
@@ -143,31 +195,34 @@ export default class OSPiSystemCard extends LitElement {
 	public connectedCallback(): void {
 		super.connectedCallback()
 
-		// this.runtimeDialog = new OSPiCardRuntimeDialog()
-		// document.body.appendChild(this.runtimeDialog)
+		this.delayDialog = new OSPiSystemCardDelayDialog()
+		document.body.appendChild(this.delayDialog)
 	}
 
 	public disconnectedCallback(): void {
 		super.disconnectedCallback()
 
-		// document.body.removeChild(this.runtimeDialog)
+		document.body.removeChild(this.delayDialog)
 	}
 
 	private menuClick() {
 		// fireEvent(this, 'hass-more-info', { entityId: this.config.station })
 	}
 
-	private actionClick(action: 'run' | 'stop') {
-		// if (action === 'stop') {
-		// 	this.hass.callService('opensprinkler', action, { entity_id: this.config.station })
-		// } else {
-		// 	this.runtimeDialog.show({
-		// 		runAction: (runtime) => {
-		// 			//@ts-ignore TODO
-		// 			this.hass.callService('opensprinkler', action, { entity_id: this.config.station, run_seconds: runtime })
-		// 		}
-		// 	})
-		// }
+	private delayClick(which: 'rain' | 'pause') {
+		const entity = which === 'rain' ? this.hass.entities['sensor.opensprinkler_rain_delay_stop_time'].entity_id : this.hass.entities['sensor.opensprinkler_pause_end_time'].entity_id
+
+		this.delayDialog.show({
+			title: which === 'rain' ? 'Rain Delay' : 'Pause Stations',
+			delayUnit: which === 'rain' ? 'hours' : 'seconds',
+			delayAction: (delay) => {
+				const action = which === 'rain' ? 'set_rain_delay' : 'pause_stations'
+				const data = which === 'rain' ? { rain_delay: delay } : { pause_duration: delay }
+
+				//@ts-ignore TODO
+				this.hass.callService('opensprinkler', action, { entity_id: entity, ...data })
+			}
+		})
 	}
 
 	protected shouldUpdate(changedProps: PropertyValues): boolean {
@@ -177,7 +232,9 @@ export default class OSPiSystemCard extends LitElement {
 		const oldHass = changedProps.get('hass') as HomeAssistant | undefined
 		if (!oldHass) return true
 
-		// if (oldHass.states[this.config.station] !== getEntityState(this.hass, this.config.station)) return true
+		for (const entity in this.state) {
+			if (oldHass.states[entity] !== this.hass.states[entity]) return true
+		}
 
 		return false
 	}
@@ -192,31 +249,26 @@ export default class OSPiSystemCard extends LitElement {
 
 	static styles = [
 		css`
-			.progress-container {
-				background-color: gray;
-				border-radius: 5px;
-
-				margin-left: 10%;
-				margin-right: 10%;
-				margin-bottom: 10px;
-
-				height: 10px;
+			.system-status {
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				padding: 5px;
 			}
 
-			.progress-progress {
-				background-color: green;
-				border-radius: 5px;
-
-				padding: 1px;
-
-				height: 8px;
-				width: 0%;
+			.system-status-item {
+				text-align: center;
+				padding: 5px;
+				white-space: nowrap;
 			}
 
-			@keyframes progress-animate {
-				to {
-					width: 100%;
-				}
+			.system-status-item-name {
+				font-weight: bold;
+			}
+
+			.system-status-item-value {
+				font-style: italic;
 			}
 		`
 	]
