@@ -1,6 +1,6 @@
 {
-    "name": "Toggle Card TypeScript",
-    "render_readme": true,
-    "filename": "card.js",
-    "content_in_root": false
-  }
+	"name": "OpenSprinkler Cards for Home Assistant",
+	"render_readme": true,
+	"filename": "ospi-cards.js",
+	"content_in_root": false
+}
