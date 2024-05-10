@@ -24,7 +24,7 @@ export default {
 		babel({
 			exclude: 'node_modules/**'
 		}),
-		!dev && terser({ format: { comments: false } }),
+		// !dev && terser({ format: { comments: false } }),
 		multi(),
 		replace({
 			preventAssignment: false,
