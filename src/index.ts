@@ -10,15 +10,12 @@ declare global {
 window.customCards = window.customCards || []
 
 function loadCard(cardElement: CardElementType) {
-	const el: CardElementType = cardElement
-
-	if (DEV_MODE) {
-		el.type = `${el.type}-dev`
-		;(el.name = `${el.name}-dev`), console.log(`${el.name} ${defaults.version} loaded...`)
-	}
-
-	window.customCards.push(el)
+	DEV_MODE && console.log(`${cardElement.name} ${defaults.version} loaded...`)
+	window.customCards.push(cardElement)
 }
 
 import { OSPiStationCardElement } from './stationcard/index'
 loadCard(OSPiStationCardElement)
+
+import { OSPiSystemCardElement } from './systemcard/index'
+loadCard(OSPiSystemCardElement)

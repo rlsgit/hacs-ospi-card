@@ -1,15 +1,15 @@
-import { defaults } from '../constants'
+import { defaults, getDevString } from '../constants'
 
 export const OSPiStationCardElement = {
-	type: 'ospi-stationcard',
-	name: 'OSPi StationCard',
-	description: 'OpenSprinkler Station Card',
+	type: getDevString('ospi-stationcard'),
+	name: getDevString('OSPi StationCard'),
+	description: getDevString('OpenSprinkler Station Card'),
 	version: defaults.version
 }
 
 export const OSPiStationCardConfigElement = {
-	type: 'ospi-stationcard-editor',
-	name: 'OSPi StationCard Editor',
-	description: 'OpenSprinkler Station Card Confguration Editor',
+	type: getDevString('ospi-stationcard-editor'),
+	name: getDevString('OSPi StationCard Editor'),
+	description: getDevString('OpenSprinkler Station Card Confguration Editor'),
 	version: defaults.version
 }

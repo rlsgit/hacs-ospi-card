@@ -2,6 +2,7 @@ import { IconConfig } from './types'
 
 //@ts-ignore
 export const DEV_MODE: boolean = '__DEV_MODE__' === 'true'
+export const getDevString = (str: string) => (DEV_MODE ? str + '-dev' : '')
 
 export const defaults = {
 	version: '0.3.0',

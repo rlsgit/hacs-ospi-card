@@ -1,21 +1,21 @@
 import { LitElement, html, TemplateResult, CSSResultGroup, css } from 'lit'
 import { customElement, state, property } from 'lit/decorators.js'
 
-import { OSPiStationCardConfigElement } from './index'
-import type { OSPiStationCardConfig } from './card'
+import { OSPiSystemCardConfigElement } from './index'
+import type { OSPiSystemCardConfig } from './card'
 import { HomeAssistant, fireEvent, getEntities } from '../ha_helpers'
 import { isStation } from '../os_helpers'
 
-@customElement(OSPiStationCardConfigElement.type)
-export class OSPiStationCardEditor extends LitElement {
+@customElement(OSPiSystemCardConfigElement.type)
+export class OSPiSystemCardEditor extends LitElement {
 	@property({ attribute: false }) public hass?: HomeAssistant
-	@state() private config?: OSPiStationCardConfig
+	@state() private config?: OSPiSystemCardConfig
 	@state() private helpers?: any
 	@state() private options: {}[]
 
 	private _initialized = false
 
-	public async setConfig(config: OSPiStationCardConfig) {
+	public async setConfig(config: OSPiSystemCardConfig) {
 		if (!this.config || config.device !== this.config.device) {
 			this.options = []
 			if (config.device) {
@@ -68,16 +68,6 @@ export class OSPiStationCardEditor extends LitElement {
 		// console.log('opts: ', this.options)
 		const schema = [
 			{ name: 'device', selector: { device: { integration: 'opensprinkler', manufacturer: 'OpenSprinkler' } } },
-			{
-				name: 'station',
-				selector: {
-					select: {
-						multiple: false,
-						mode: 'dropdown',
-						options: this.options || []
-					}
-				}
-			},
 			{ name: 'name', selector: { text: {} } },
 			{ name: 'showName', selector: { boolean: {} } },
 			{ name: 'image', selector: { text: {} } },
