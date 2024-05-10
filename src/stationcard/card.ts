@@ -122,18 +122,10 @@ export default class OSPiStationCard extends LitElement {
 		let actions = html``
 		if (enabled) {
 			if (stateStoppable(this.state)) {
-				actions = html`
-					<mwc-icon-button class="button" @click=${() => this.actionClick('stop')} .disabled=${!enabled}>
-						<ha-svg-icon .path=${mdiStop}></ha-svg-icon>
-					</mwc-icon-button>
-				`
+				actions = html` <mwc-button @click=${() => this.actionClick('stop')} .disabled=${!enabled}> <ha-svg-icon .path=${mdiStop}></ha-svg-icon> Stop </mwc-button> `
 			} else {
 				const inputStyle = 'margin-left: 10px; height: 20px;'
-				actions = html`
-					<mwc-icon-button class="button" @click=${() => this.actionClick('run')} .disabled=${!enabled}>
-						<ha-svg-icon .path=${mdiPlay}></ha-svg-icon>
-					</mwc-icon-button>
-				`
+				actions = html` <mwc-button @click=${() => this.actionClick('run')} .disabled=${!enabled}> <ha-svg-icon .path=${mdiPlay}></ha-svg-icon> Run </mwc-button> `
 			}
 		}
 

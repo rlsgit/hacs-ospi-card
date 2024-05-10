@@ -5,11 +5,9 @@ export const DEV_MODE: boolean = '__DEV_MODE__' === 'true'
 export const getDevString = (str: string) => (DEV_MODE ? str + '-dev' : '')
 
 export const defaults = {
-	version: '0.3.0',
+	version: '0.4.0',
 
-	imageHeightDefault: 150,
-
-	runtimeDefault: 60
+	imageHeightDefault: 150
 }
 
 export const defaultIcons: IconConfig = {
