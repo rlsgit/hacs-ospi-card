@@ -1,4 +1,4 @@
-import { html, LitElement, TemplateResult, css, PropertyValues } from 'lit'
+import { html, LitElement, TemplateResult, css, PropertyValues, nothing } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import { mdiPlay, mdiStop, mdiDotsVertical, mdiClose } from '@mdi/js'
 import moment from 'moment'
@@ -8,7 +8,7 @@ import { HassEntity } from 'home-assistant-js-websocket'
 import { OSPiStationCardElement, OSPiStationCardConfigElement } from './index'
 import { IconConfig } from '../types'
 import { defaults, defaultIcons } from '../constants'
-import { fireEvent, getEntities, getEntityState, HomeAssistant } from '../ha_helpers'
+import { fireEvent, getCardStyle, getEntities, getEntityState, HomeAssistant } from '../ha_helpers'
 import { isEnabled, stateActivated, stateStoppable } from '../os_helpers'
 
 import OSPiCardRuntimeDialog from './runtimedialog'
@@ -201,15 +201,11 @@ export default class OSPiStationCard extends LitElement {
 	}
 
 	render() {
+		if (!this.config) return nothing
+
 		this.state = getEntityState(this.hass, this.config.station)
 
-		let ret: TemplateResult = html``
-
-		if (this.config) {
-			ret = html` <ha-card> ${this.cardImage()} ${this.cardName()} ${this.cardStatus()} ${this.progress()} ${this.history()} </ha-card> `
-		}
-
-		return ret
+		return html` <ha-card style="${getCardStyle()}"> ${this.cardImage()} ${this.cardName()} ${this.cardStatus()} ${this.progress()} ${this.history()} </ha-card> `
 	}
 
 	public connectedCallback(): void {

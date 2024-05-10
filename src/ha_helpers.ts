@@ -1,5 +1,6 @@
 import { Auth, Connection, HassConfig, HassEntities, HassEntity, HassServices, HassServiceTarget, MessageBase } from 'home-assistant-js-websocket'
 import { LitElement } from 'lit'
+import { DEV_MODE } from './constants'
 
 export type { HassEntity, LitElement }
 
@@ -160,4 +161,10 @@ export function fireEvent(el: LitElement, event: string, detail: {}, bubbles: bo
 		composed: composed
 	})
 	el.dispatchEvent(messageEvent)
+}
+
+export function getCardStyle(style?: string): string {
+	const devStyle = DEV_MODE ? ' border: 1px dashed red; ' : ''
+
+	return (style || '') + devStyle
 }

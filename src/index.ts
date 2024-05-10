@@ -1,8 +1,5 @@
-import { defaults } from './constants'
-
-import { OSPiStationCardElement } from './stationcard/index'
-
-console.log(`OSPi StationCard ${defaults.version} loaded...`)
+import { defaults, DEV_MODE } from './constants'
+import { type CardElementType } from './types'
 
 declare global {
 	interface Window {
@@ -12,4 +9,16 @@ declare global {
 
 window.customCards = window.customCards || []
 
-window.customCards.push(OSPiStationCardElement)
+function loadCard(cardElement: CardElementType) {
+	const el: CardElementType = cardElement
+
+	if (DEV_MODE) {
+		el.type = `${el.type}-dev`
+		;(el.name = `${el.name}-dev`), console.log(`${el.name} ${defaults.version} loaded...`)
+	}
+
+	window.customCards.push(el)
+}
+
+import { OSPiStationCardElement } from './stationcard/index'
+loadCard(OSPiStationCardElement)

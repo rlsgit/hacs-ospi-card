@@ -1,5 +1,8 @@
 import { IconConfig } from './types'
 
+//@ts-ignore
+export const DEV_MODE: boolean = '__DEV_MODE__' === 'true'
+
 export const defaults = {
 	version: '0.3.0',
 
