@@ -90,7 +90,7 @@ export default class OSPiStationCard extends LitElement {
 
 		return html`
 			<div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
-				<div style="font-weight: bold; font-size: 24px;">${this.config.name}</div>
+				<div style="font-weight: bold; font-size: 18px;">${this.config.name}</div>
 				<div style="position: absolute; right: 0;">${menu}</div>
 			</div>
 		`
@@ -189,7 +189,7 @@ export default class OSPiStationCard extends LitElement {
 			})
 		}
 
-		return html`<div style="text-align: center; font-style: italic;">${this.lastRun}</div>`
+		return html`<div style="text-align: center; font-style: italic; font-size: 10px">${this.lastRun}</div>`
 	}
 
 	render() {

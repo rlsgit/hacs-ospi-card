@@ -2,7 +2,7 @@
 const DEV_MODE = 'false' === 'true';
 const getDevString = (str) => (str);
 const defaults = {
-    version: '0.4.0',
+    version: '0.4.1',
     imageHeightDefault: 150
 };
 const defaultIcons = {
@@ -6013,7 +6013,7 @@ let OSPiStationCard = class OSPiStationCard extends s {
 		`;
         return x `
 			<div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
-				<div style="font-weight: bold; font-size: 24px;">${this.config.name}</div>
+				<div style="font-weight: bold; font-size: 18px;">${this.config.name}</div>
 				<div style="position: absolute; right: 0;">${menu}</div>
 			</div>
 		`;
@@ -6097,7 +6097,7 @@ let OSPiStationCard = class OSPiStationCard extends s {
                 }
             });
         }
-        return x `<div style="text-align: center; font-style: italic;">${this.lastRun}</div>`;
+        return x `<div style="text-align: center; font-style: italic; font-size: 10px">${this.lastRun}</div>`;
     }
     render() {
         if (!this.config)
@@ -6435,7 +6435,7 @@ let OSPiSystemCard = class OSPiSystemCard extends s {
             return x ``;
         return x `
 			<div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
-				<div style="font-weight: bold; font-size: 24px;">${this.config.name}</div>
+				<div style="font-weight: bold; font-size: 18px;">${this.config.name}</div>
 			</div>
 		`;
     }

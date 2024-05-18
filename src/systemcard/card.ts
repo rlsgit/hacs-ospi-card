@@ -82,7 +82,7 @@ export default class OSPiSystemCard extends LitElement {
 
 		return html`
 			<div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
-				<div style="font-weight: bold; font-size: 24px;">${this.config.name}</div>
+				<div style="font-weight: bold; font-size: 18px;">${this.config.name}</div>
 			</div>
 		`
 	}
