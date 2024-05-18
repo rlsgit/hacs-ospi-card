@@ -3,7 +3,8 @@ import { customElement, state } from 'lit/decorators.js'
 import { mdiClose } from '@mdi/js'
 import { getDevString } from '../constants'
 
-export const defaultRuntime = 60
+export const defaultRuntime = 10
+
 export type OSPiStationCardRuntimeDialogOptionsType = {
 	runtime?: number
 	runAction: (runtime: number) => void
@@ -32,12 +33,12 @@ export default class OSPiStationCardRuntimeDialog extends LitElement {
 	}
 
 	private run() {
-		if (this.runtime >= 10 && this.runtime <= 1200) {
+		if (this.runtime >= 1 && this.runtime <= 30) {
 			this.close()
 			this.error = undefined
 			this.config.runAction(this.runtime)
 		} else {
-			this.error = 'Runtime must be between 10 and 1200 seconds'
+			this.error = 'Runtime must be between 1 and 30 minutes'
 		}
 	}
 
@@ -52,7 +53,7 @@ export default class OSPiStationCardRuntimeDialog extends LitElement {
 			<ha-icon-button .label=${'Close'} .path=${mdiClose} dialogAction="close" class="header_button"></ha-icon-button>
 		</div>`
 
-		const label = 'Enter runtime in seconds'
+		const label = 'Enter runtime in minutes'
 
 		return html`
 			<ha-dialog open @closed=${this.close} .heading=${heading}>

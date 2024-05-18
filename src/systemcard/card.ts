@@ -63,12 +63,7 @@ export default class OSPiSystemCard extends LitElement {
 			const style = `
         background-image: url('${url}'); 
         height: ${height}; 
-        width: 100%;
-        background-repeat: no-repeat;
         background-size: ${this.config.imagePosition || 'cover'};
-        background-position: center;
-        border-top-left-radius: var(--ha-card-border-radius, 12px);
-        border-top-right-radius: var(--ha-card-border-radius, 12px);
       `
 
 			ret = html`<div class="card-image" style="${style}"></div>`
@@ -81,8 +76,8 @@ export default class OSPiSystemCard extends LitElement {
 		if (!this.config.showName) return html``
 
 		return html`
-			<div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
-				<div style="font-weight: bold; font-size: 18px;">${this.config.name}</div>
+			<div class="card-name">
+				<div class="card-name-name">${this.config.name}</div>
 			</div>
 		`
 	}
@@ -254,13 +249,13 @@ export default class OSPiSystemCard extends LitElement {
 				flex-direction: row;
 				justify-content: center;
 				align-items: center;
-				padding: 5px;
+				padding: 2px 0 2px 0;
 			}
 
 			.system-status-item {
 				text-align: center;
-				padding: 5px;
 				white-space: nowrap;
+				padding: 2px 0 2px 0;
 			}
 
 			.system-status-item-name {
@@ -269,6 +264,27 @@ export default class OSPiSystemCard extends LitElement {
 
 			.system-status-item-value {
 				font-style: italic;
+			}
+
+			.card-image {
+				width: 100%;
+				background-repeat: no-repeat;
+				background-position: center;
+				border-top-left-radius: var(--ha-card-border-radius, 12px);
+				border-top-right-radius: var(--ha-card-border-radius, 12px);
+			}
+
+			.card-name {
+				padding: 2px 0 2px 0 !important;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 10px;
+			}
+
+			.card-name-name {
+				font-weight: bold;
+				font-size: 18px;
 			}
 		`
 	]

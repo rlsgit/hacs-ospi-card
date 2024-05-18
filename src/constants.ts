@@ -5,7 +5,7 @@ export const DEV_MODE: boolean = '__DEV_MODE__' === 'true'
 export const getDevString = (str: string) => (DEV_MODE ? str + '-dev' : str)
 
 export const defaults = {
-	version: '0.4.1',
+	version: '0.4.2',
 
 	imageHeightDefault: 150
 }

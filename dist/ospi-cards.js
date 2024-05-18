@@ -2,7 +2,7 @@
 const DEV_MODE = 'false' === 'true';
 const getDevString = (str) => (str);
 const defaults = {
-    version: '0.4.1',
+    version: '0.4.2',
     imageHeightDefault: 150
 };
 const defaultIcons = {
@@ -5908,7 +5908,7 @@ var moment$1 = {exports: {}};
 var momentExports = moment$1.exports;
 var moment = /*@__PURE__*/getDefaultExportFromCjs(momentExports);
 
-const defaultRuntime = 60;
+const defaultRuntime = 10;
 let OSPiStationCardRuntimeDialog = class OSPiStationCardRuntimeDialog extends s {
     constructor() {
         super(...arguments);
@@ -5923,13 +5923,13 @@ let OSPiStationCardRuntimeDialog = class OSPiStationCardRuntimeDialog extends s 
         this.open = false;
     }
     run() {
-        if (this.runtime >= 10 && this.runtime <= 1200) {
+        if (this.runtime >= 1 && this.runtime <= 30) {
             this.close();
             this.error = undefined;
             this.config.runAction(this.runtime);
         }
         else {
-            this.error = 'Runtime must be between 10 and 1200 seconds';
+            this.error = 'Runtime must be between 1 and 30 minutes';
         }
     }
     runtimeChanged(event) {
@@ -5942,7 +5942,7 @@ let OSPiStationCardRuntimeDialog = class OSPiStationCardRuntimeDialog extends s 
 			<span>Runtime</span>
 			<ha-icon-button .label=${'Close'} .path=${mdiClose} dialogAction="close" class="header_button"></ha-icon-button>
 		</div>`;
-        const label = 'Enter runtime in seconds';
+        const label = 'Enter runtime in minutes';
         return x `
 			<ha-dialog open @closed=${this.close} .heading=${heading}>
 				<div class="content" style="display: flex; flex-direction: row; flex-wrap: wrap;">
@@ -5992,12 +5992,7 @@ let OSPiStationCard = class OSPiStationCard extends s {
             const style = `
         background-image: url('${url}'); 
         height: ${height}; 
-        width: 100%;
-        background-repeat: no-repeat;
         background-size: ${this.config.imagePosition || 'cover'};
-        background-position: center;
-        border-top-left-radius: var(--ha-card-border-radius, 12px);
-        border-top-right-radius: var(--ha-card-border-radius, 12px);
       `;
             ret = x `<div class="card-image" style="${style}"></div>`;
         }
@@ -6012,9 +6007,9 @@ let OSPiStationCard = class OSPiStationCard extends s {
 			</mwc-icon-button>
 		`;
         return x `
-			<div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
-				<div style="font-weight: bold; font-size: 18px;">${this.config.name}</div>
-				<div style="position: absolute; right: 0;">${menu}</div>
+			<div class="card-name">
+				<div class="card-name-name">${this.config.name}</div>
+				<div class="card-name-options">${menu}</div>
 			</div>
 		`;
     }
@@ -6032,11 +6027,6 @@ let OSPiStationCard = class OSPiStationCard extends s {
             stateText = 'Disabled';
         }
         let state = x `<span>${stateText}</span>`;
-        const style = `
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    `;
         const icon = this.getStateIcon(enabled);
         let actions = x ``;
         if (enabled) {
@@ -6051,7 +6041,7 @@ let OSPiStationCard = class OSPiStationCard extends s {
 			<state-badge .hass=${this.hass} .stateObj=${this.state} .overrideIcon=${icon}></state-badge>
 			${state} ${actions}
 		`;
-        return x ` <div style="${style}">${badge}</div> `;
+        return x ` <div class="card-status">${badge}</div> `;
     }
     progress() {
         let ret = x ``;
@@ -6097,7 +6087,7 @@ let OSPiStationCard = class OSPiStationCard extends s {
                 }
             });
         }
-        return x `<div style="text-align: center; font-style: italic; font-size: 10px">${this.lastRun}</div>`;
+        return x `<div class="card-history">${this.lastRun}</div>`;
     }
     render() {
         if (!this.config)
@@ -6124,6 +6114,8 @@ let OSPiStationCard = class OSPiStationCard extends s {
         else {
             this.runtimeDialog.show({
                 runAction: (runtime) => {
+                    // runtime is in minutes...convert to seconds...
+                    runtime = runtime * 60;
                     //@ts-ignore TODO
                     this.hass.callService('opensprinkler', action, { entity_id: this.config.station, run_seconds: runtime });
                 }
@@ -6152,6 +6144,45 @@ let OSPiStationCard = class OSPiStationCard extends s {
 };
 OSPiStationCard.styles = [
     i$2 `
+			.card-image {
+				width: 100%;
+				background-repeat: no-repeat;
+				background-position: center;
+				border-top-left-radius: var(--ha-card-border-radius, 12px);
+				border-top-right-radius: var(--ha-card-border-radius, 12px);
+			}
+
+			.card-name {
+				padding: 2px 0 2px 0 !important;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 10px;
+			}
+
+			.card-name-name {
+				font-weight: bold;
+				font-size: 18px;
+			}
+
+			.card-name-options {
+				position: absolute;
+				right: 0;
+			}
+
+			.card-status {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 2px 0 2px 0;
+			}
+
+			.card-history {
+				text-align: center;
+				font-style: italic;
+				font-size: 10px;
+			}
+
 			.progress-container {
 				background-color: gray;
 				border-radius: 5px;
@@ -6419,12 +6450,7 @@ let OSPiSystemCard = class OSPiSystemCard extends s {
             const style = `
         background-image: url('${url}'); 
         height: ${height}; 
-        width: 100%;
-        background-repeat: no-repeat;
         background-size: ${this.config.imagePosition || 'cover'};
-        background-position: center;
-        border-top-left-radius: var(--ha-card-border-radius, 12px);
-        border-top-right-radius: var(--ha-card-border-radius, 12px);
       `;
             ret = x `<div class="card-image" style="${style}"></div>`;
         }
@@ -6434,8 +6460,8 @@ let OSPiSystemCard = class OSPiSystemCard extends s {
         if (!this.config.showName)
             return x ``;
         return x `
-			<div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
-				<div style="font-weight: bold; font-size: 18px;">${this.config.name}</div>
+			<div class="card-name">
+				<div class="card-name-name">${this.config.name}</div>
 			</div>
 		`;
     }
@@ -6582,13 +6608,13 @@ OSPiSystemCard.styles = [
 				flex-direction: row;
 				justify-content: center;
 				align-items: center;
-				padding: 5px;
+				padding: 2px 0 2px 0;
 			}
 
 			.system-status-item {
 				text-align: center;
-				padding: 5px;
 				white-space: nowrap;
+				padding: 2px 0 2px 0;
 			}
 
 			.system-status-item-name {
@@ -6597,6 +6623,27 @@ OSPiSystemCard.styles = [
 
 			.system-status-item-value {
 				font-style: italic;
+			}
+
+			.card-image {
+				width: 100%;
+				background-repeat: no-repeat;
+				background-position: center;
+				border-top-left-radius: var(--ha-card-border-radius, 12px);
+				border-top-right-radius: var(--ha-card-border-radius, 12px);
+			}
+
+			.card-name {
+				padding: 2px 0 2px 0 !important;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 10px;
+			}
+
+			.card-name-name {
+				font-weight: bold;
+				font-size: 18px;
 			}
 		`
 ];

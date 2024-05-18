@@ -65,12 +65,7 @@ export default class OSPiStationCard extends LitElement {
 			const style = `
         background-image: url('${url}'); 
         height: ${height}; 
-        width: 100%;
-        background-repeat: no-repeat;
         background-size: ${this.config.imagePosition || 'cover'};
-        background-position: center;
-        border-top-left-radius: var(--ha-card-border-radius, 12px);
-        border-top-right-radius: var(--ha-card-border-radius, 12px);
       `
 
 			ret = html`<div class="card-image" style="${style}"></div>`
@@ -89,9 +84,9 @@ export default class OSPiStationCard extends LitElement {
 		`
 
 		return html`
-			<div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
-				<div style="font-weight: bold; font-size: 18px;">${this.config.name}</div>
-				<div style="position: absolute; right: 0;">${menu}</div>
+			<div class="card-name">
+				<div class="card-name-name">${this.config.name}</div>
+				<div class="card-name-options">${menu}</div>
 			</div>
 		`
 	}
@@ -111,12 +106,6 @@ export default class OSPiStationCard extends LitElement {
 		}
 		let state = html`<span>${stateText}</span>`
 
-		const style = `
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    `
-
 		const icon = this.getStateIcon(enabled)
 
 		let actions = html``
@@ -134,7 +123,7 @@ export default class OSPiStationCard extends LitElement {
 			${state} ${actions}
 		`
 
-		return html` <div style="${style}">${badge}</div> `
+		return html` <div class="card-status">${badge}</div> `
 	}
 
 	private progress(): TemplateResult {
@@ -189,7 +178,7 @@ export default class OSPiStationCard extends LitElement {
 			})
 		}
 
-		return html`<div style="text-align: center; font-style: italic; font-size: 10px">${this.lastRun}</div>`
+		return html`<div class="card-history">${this.lastRun}</div>`
 	}
 
 	render() {
@@ -223,6 +212,9 @@ export default class OSPiStationCard extends LitElement {
 		} else {
 			this.runtimeDialog.show({
 				runAction: (runtime) => {
+					// runtime is in minutes...convert to seconds...
+					runtime = runtime * 60
+
 					//@ts-ignore TODO
 					this.hass.callService('opensprinkler', action, { entity_id: this.config.station, run_seconds: runtime })
 				}
@@ -252,6 +244,45 @@ export default class OSPiStationCard extends LitElement {
 
 	static styles = [
 		css`
+			.card-image {
+				width: 100%;
+				background-repeat: no-repeat;
+				background-position: center;
+				border-top-left-radius: var(--ha-card-border-radius, 12px);
+				border-top-right-radius: var(--ha-card-border-radius, 12px);
+			}
+
+			.card-name {
+				padding: 2px 0 2px 0 !important;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 10px;
+			}
+
+			.card-name-name {
+				font-weight: bold;
+				font-size: 18px;
+			}
+
+			.card-name-options {
+				position: absolute;
+				right: 0;
+			}
+
+			.card-status {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 2px 0 2px 0;
+			}
+
+			.card-history {
+				text-align: center;
+				font-style: italic;
+				font-size: 10px;
+			}
+
 			.progress-container {
 				background-color: gray;
 				border-radius: 5px;
