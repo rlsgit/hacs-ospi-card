@@ -2,7 +2,7 @@
 const DEV_MODE = 'false' === 'true';
 const getDevString = (str) => (str);
 const defaults = {
-    version: '0.4.2',
+    version: '0.4.3',
     imageHeightDefault: 150
 };
 const defaultIcons = {
@@ -6077,9 +6077,9 @@ let OSPiStationCard = class OSPiStationCard extends s {
                 // console.log(data)
                 const history = data[0];
                 for (let index = history.length - 1; index >= 0; index--) {
-                    if (history[index].state === 'off' && index > 0) {
-                        const start = moment(history[index - 1].last_changed);
-                        const stop = moment(history[index].last_changed);
+                    if (history[index].state === 'on') {
+                        const start = moment(history[index].last_changed);
+                        const stop = moment(history[index + 1].last_changed);
                         const duration = moment.duration(stop.diff(start));
                         this.lastRun = `Last run: ${start.format('M/D/YY h:mm A')} for ${duration.humanize()}`;
                         break;
